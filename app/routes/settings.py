@@ -4,12 +4,48 @@ from app import db
 
 settings_bp = Blueprint('settings', __name__)
 
-@settings_bp.route('/settings', methods=['GET'])
+@settings_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
+    from flask import request, redirect, url_for, flash
     settings = Setting.query.first()
     mail_settings = MailSetting.query.first()
     appointment_types = AppointmentType.query.order_by(AppointmentType.name).all()
-    return render_template('settings.html', settings=settings, mail_settings=mail_settings, appointment_types=appointment_types)
+    if request.method == 'POST':
+        company_name = request.form.get('company_name')
+        siret = request.form.get('siret')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        address = request.form.get('address')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        logo_file = request.files.get('logo')
+        if not settings:
+            settings = Setting()
+            db.session.add(settings)
+        settings.company_name = company_name
+        settings.siret = siret
+        settings.first_name = first_name
+        settings.last_name = last_name
+        settings.address = address
+        settings.phone = phone
+        settings.email = email
+        import os
+        if logo_file and logo_file.filename:
+            filename = logo_file.filename.replace(' ', '_')
+            upload_dir = os.path.join(os.path.dirname(__file__), '../static/uploads')
+            os.makedirs(upload_dir, exist_ok=True)
+            logo_path = os.path.join(upload_dir, filename)
+            logo_file.save(logo_path)
+            # Store relative path for use in templates
+            settings.logo = f'static/uploads/{filename}'
+        db.session.commit()
+        flash('Informations entreprise enregistrées.', 'success')
+        return redirect(url_for('settings.settings'))
+    import os
+    logo_url = None
+    if settings and settings.logo:
+        logo_url = url_for('static', filename=f'uploads/{os.path.basename(settings.logo)}')
+    return render_template('settings.html', settings=settings, mail_settings=mail_settings, appointment_types=appointment_types, logo_url=logo_url)
 
 @settings_bp.route('/settings/add_appointment_type', methods=['POST'])
 def add_appointment_type():

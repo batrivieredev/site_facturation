@@ -8,7 +8,7 @@
                 <i class="fas fa-file-invoice"></i> Créer une facture
             </div>
             <div class="card-body">
-                <form id="invoice-create-form" class="row g-3 align-items-end">
+                <form id="invoice-create-form" class="row g-3 align-items-end" method="POST" action="/invoices">
                     <div class="col-md-3">
                         <label for="client" class="form-label">Client</label>
                         <select class="form-select" id="client" name="client">
@@ -91,7 +91,11 @@
                         </td>
                         <td>
                             <a href="/invoices/{{ invoice.id }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a>
+                            <a href="/invoices/{{ invoice.id }}/pdf" class="btn btn-sm btn-outline-success" download><i class="fas fa-download"></i></a>
                             <button class="btn btn-sm btn-outline-secondary send-invoice-btn" data-id="{{ invoice.id }}"><i class="fas fa-paper-plane"></i></button>
+                            <form method="POST" action="/invoices/{{ invoice.id }}/delete" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cette facture ?');"><i class="fas fa-trash"></i></button>
+                            </form>
                         </td>
                     </tr>
                 {% else %}

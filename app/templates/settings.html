@@ -6,14 +6,22 @@
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-primary text-white"><i class="fas fa-building"></i> Informations entreprise</div>
             <div class="card-body">
-                <form id="company-form">
+                <form id="company-form" method="POST" action="/settings" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="company-siret" class="form-label">SIRET</label>
-                        <input type="text" class="form-control" id="company-siret" name="siret" value="{{ settings.siret }}">
+                        <input type="text" class="form-control" id="company-siret" name="siret" maxlength="20" value="{{ settings.siret }}">
                     </div>
                     <div class="mb-3">
-                        <label for="company-name" class="form-label">Nom / Prénom</label>
-                        <input type="text" class="form-control" id="company-name" name="name" value="{{ settings.name }}">
+                        <label for="company-name" class="form-label">Nom de l'entreprise</label>
+                        <input type="text" class="form-control" id="company-name" name="company_name" maxlength="255" value="{{ settings.company_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="company-first-name" class="form-label">Prénom</label>
+                        <input type="text" class="form-control" id="company-first-name" name="first_name" maxlength="100" value="{{ settings.first_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="company-last-name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="company-last-name" name="last_name" maxlength="100" value="{{ settings.last_name }}">
                     </div>
                     <div class="mb-3">
                         <label for="company-address" class="form-label">Adresse</label>
@@ -30,8 +38,8 @@
                     <div class="mb-3">
                         <label for="company-logo" class="form-label">Logo</label>
                         <input type="file" class="form-control" id="company-logo" name="logo">
-                        {% if settings.logo_url %}
-                        <img src="{{ settings.logo_url }}" alt="Logo" class="img-thumbnail mt-2" style="max-height: 80px;">
+                        {% if logo_url %}
+                        <img src="{{ logo_url }}" alt="Logo" class="img-thumbnail mt-2" style="max-height: 80px;">
                         {% endif %}
                     </div>
                     <button type="submit" class="btn btn-primary">Enregistrer</button>

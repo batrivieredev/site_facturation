@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}Facture {{ invoice.number }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-0">FACTURE</h4>
+                <small class="text-white-50">Numéro : {{ invoice.number }}</small>
+            </div>
+            {% if company.logo %}
+            <img src="/{{ company.logo }}" alt="Logo entreprise" class="img-thumbnail" style="max-height:60px;">
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5 class="mb-1">Entreprise</h5>
+                    <div class="border p-2 rounded bg-light">
+                        <strong>{{ company.company_name }}</strong><br>
+                        EI / Auto-entrepreneur<br>
+                        {{ company.first_name }} {{ company.last_name }}<br>
+                        {{ company.address }}<br>
+                        Tél : {{ company.phone }}<br>
+                        Email : {{ company.email }}<br>
+                        SIRET : {{ company.siret }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="mb-1">Client</h5>
+                    <div class="border p-2 rounded bg-light">
+                        <strong>{{ client.last_name }} {{ client.first_name }}</strong><br>
+                        {{ client.address }}<br>
+                        Tél : {{ client.phone }}<br>
+                        Email : {{ client.email }}
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong>Date d'émission :</strong> {{ invoice.date.strftime('%d/%m/%Y') }}<br>
+                    <strong>Date de la prestation :</strong> {{ invoice.date.strftime('%d/%m/%Y') }}
+                </div>
+                <div class="col-md-6 text-end">
+                    <strong>Statut :</strong> {{ invoice.status|capitalize }}
+                </div>
+            </div>
+            <div class="table-responsive mb-3">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Désignation</th>
+                            <th>Type de RDV</th>
+                            <th>Durée</th>
+                            <th>Prix unitaire</th>
+                            <th>Quantité</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>Séance de {{ item.description }}</td>
+                            <td>{{ item.description }}</td>
+                            <td>{{ item.duration if item.duration else '' }} min</td>
+                            <td>{{ item.unit_price }} €</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.total }} €</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="6" class="text-center text-muted">Aucun élément</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="row justify-content-end">
+                <div class="col-md-6">
+                    <table class="table mb-0">
+                        <tr>
+                            <th class="text-end">Total HT</th>
+                            <td class="text-end">{{ invoice.total }} €</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">TVA</th>
+                            <td class="text-end">0 € – TVA non applicable, art. 293B du CGI</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Total à payer</th>
+                            <td class="text-end fw-bold">{{ invoice.total }} €</td>
+                        </tr>
+                    </table>
+                    <div class="mt-2 text-end text-muted" style="font-size:0.95em;">
+                        TVA non applicable, article 293B du CGI
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <strong>Conditions de paiement :</strong> Paiement comptant<br>
+                <strong>Moyen de paiement :</strong> Espèces, chèque, virement<br>
+                <strong>Mention légale EI :</strong> EI / Auto-entrepreneur<br>
+                <strong>Contact :</strong> {{ company.email }} / {{ company.phone }}
+            </div>
+            <form method="POST" class="my-4">
+                <div class="input-group" style="max-width: 300px;">
+                    <select name="status" class="form-select">
+                        <option value="brouillon" {% if invoice.status == 'brouillon' %}selected{% endif %}>Brouillon</option>
+                        <option value="validée" {% if invoice.status == 'validée' %}selected{% endif %}>Validée</option>
+                        <option value="envoyée" {% if invoice.status == 'envoyée' %}selected{% endif %}>Envoyée</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-primary">Modifier statut</button>
+                </div>
+            </form>
+            <div class="mt-3">
+                <a href="/invoices/{{ invoice.id }}/pdf" class="btn btn-success" download><i class="fas fa-download"></i> Télécharger PDF</a>
+            </div>
+            <div class="mt-2 text-end text-muted" style="font-size:0.9em;">
+                Page 1/1
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
