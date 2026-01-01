@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">CA du jour</h6>
+                <div class="h3 fw-bold"><i class="fas fa-euro-sign fs-2 text-primary"></i> {{ revenue_today }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">CA semaine</h6>
+                <div class="h3 fw-bold"><i class="fas fa-calendar-week fs-2 text-primary"></i> {{ revenue_week }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">CA mois</h6>
+                <div class="h3 fw-bold"><i class="fas fa-calendar-alt fs-2 text-primary"></i> {{ revenue_month }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm border-0 text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">CA année</h6>
+                <div class="h3 fw-bold"><i class="fas fa-calendar fs-2 text-primary"></i> {{ revenue_year }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-calendar-check"></i> Prochain rendez-vous</span>
+                <span class="badge bg-info">MAJ auto 2 min</span>
+            </div>
+            <div class="card-body">
+                {% if next_appointment %}
+                <div class="mb-2 fw-semibold">Client : {{ next_appointment.client_name }}</div>
+                <div class="mb-2">Type : <span class="badge bg-info">{{ next_appointment.type }}</span></div>
+                <div class="mb-2 text-muted">Date : {{ next_appointment.date }}</div>
+                <div class="mb-2 text-muted">Heure : {{ next_appointment.time }}</div>
+                {% else %}
+                <small class="text-muted">Aucun rendez-vous à venir</small>
+                {% endif %}
+                <a href="https://calendar.google.com" target="_blank" class="btn btn-outline-primary btn-sm mt-3"><i class="fab fa-google"></i> Voir l'agenda</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white fw-bold"><i class="fas fa-file-invoice"></i> Dernières factures</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>#</th>
+                                <th>Client</th>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for invoice in latest_invoices %}
+                            <tr>
+                                <td>{{ invoice.number }}</td>
+                                <td>{{ invoice.client_name }}</td>
+                                <td>{{ invoice.date }}</td>
+                                <td>{{ invoice.amount }} €</td>
+                                <td>
+                                    {% if invoice.status == 'brouillon' %}
+                                        <span class="badge bg-secondary">Brouillon</span>
+                                    {% elif invoice.status == 'envoyée' %}
+                                        <span class="badge bg-warning text-dark">Envoyée</span>
+                                    {% elif invoice.status == 'payée' %}
+                                        <span class="badge bg-success">Payée</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="5" class="text-center text-muted">Aucune facture récente</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

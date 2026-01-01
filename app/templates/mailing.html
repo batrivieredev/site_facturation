@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Mailing{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Mailing</h2>
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#mailModal"><i class="fas fa-paper-plane"></i> Nouveau mailing</button>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-3 mb-2">
+        <select class="form-select" id="filter-rdv-status">
+            <option value="">Tous statuts RDV</option>
+            <option value="honoré">Honoré</option>
+            <option value="reporté">Reporté</option>
+            <option value="pas venu">Pas venu</option>
+        </select>
+    </div>
+    <div class="col-md-3 mb-2">
+        <select class="form-select" id="filter-rdv-type">
+            <option value="">Tous types de RDV</option>
+            {% for t in appointment_types %}
+                <option value="{{ t.name }}">{{ t.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4 mb-2">
+        <input type="text" class="form-control" id="search-mail-client" placeholder="Recherche client...">
+    </div>
+</div>
+<div class="card shadow-sm border-0 mt-4">
+    <div class="card-header bg-secondary text-white"><i class="fas fa-envelope"></i> Historique des envois</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="mail-log-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Destinataires</th>
+                        <th>Sujet</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for mail in mail_logs %}
+                    <tr>
+                        <td>{{ mail.date }}</td>
+                        <td>{{ mail.recipients }}</td>
+                        <td>{{ mail.subject }}</td>
+                        <td>
+                            {% if mail.status == 'envoyé' %}
+                                <span class="badge bg-success">Envoyé</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ mail.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary view-mail-btn" data-id="{{ mail.id }}"><i class="fas fa-eye"></i></button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="5" class="text-center text-muted">Aucun envoi</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Modal Mailing -->
+<div class="modal fade" id="mailModal" tabindex="-1" aria-labelledby="mailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="mail-form">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mailModalLabel">Nouveau mailing</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="mail-recipients" class="form-label">Destinataires (sélection multiple)</label>
+            <select class="form-select" id="mail-recipients" name="recipients" multiple>
+              {% for client in clients %}
+                <option value="{{ client.email }}">{{ client.full_name }} ({{ client.email }})</option>
+              {% endfor %}
+            </select>
+            <input type="text" class="form-control mt-2" id="search-modal-client" placeholder="Recherche client...">
+          </div>
+          <div class="mb-3">
+            <label for="mail-rdv-status" class="form-label">Filtrer par statut RDV</label>
+            <select class="form-select" id="mail-rdv-status">
+              <option value="">Tous</option>
+              <option value="honoré">Honoré</option>
+              <option value="reporté">Reporté</option>
+              <option value="pas venu">Pas venu</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="mail-rdv-type" class="form-label">Filtrer par type RDV</label>
+            <select class="form-select" id="mail-rdv-type">
+              <option value="">Tous</option>
+              {% for t in appointment_types %}
+                <option value="{{ t.name }}">{{ t.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="mail-bcc" name="bcc">
+            <label class="form-check-label" for="mail-bcc">Envoyer en copie cachée (BCC)</label>
+          </div>
+          <div class="mb-3">
+            <label for="mail-cc" class="form-label">Ajouter une copie (CC)</label>
+            <input type="email" class="form-control" id="mail-cc" name="cc" placeholder="Email en copie">
+          </div>
+          <div class="mb-3">
+            <label for="mail-template" class="form-label">Mail type</label>
+            <select class="form-select" id="mail-template" name="template">
+              {% for template in mail_templates %}
+                <option value="{{ template.id }}">{{ template.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="mail-signature" class="form-label">Signature</label>
+            <select class="form-select" id="mail-signature" name="signature">
+              {% for signature in mail_signatures %}
+                <option value="{{ signature.id }}">{{ signature.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="mail-subject" class="form-label">Sujet</label>
+            <input type="text" class="form-control" id="mail-subject" name="subject" required>
+          </div>
+          <div class="mb-3">
+            <label for="mail-body" class="form-label">Message</label>
+            <textarea class="form-control" id="mail-body" name="body" rows="6" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Envoyer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/mailing.js"></script>
+<script>
+// Recherche instantanée
+const searchInput = document.getElementById('search-mail-client');
+const mailTable = document.getElementById('mail-log-table');
+if(searchInput && mailTable) {
+    searchInput.addEventListener('input', function() {
+        const val = searchInput.value.toLowerCase();
+        for(const row of mailTable.tBodies[0].rows) {
+            const dest = row.cells[1].textContent.toLowerCase();
+            row.style.display = dest.includes(val) ? '' : 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

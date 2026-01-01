@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}Facturation{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-file-invoice"></i> Créer une facture
+            </div>
+            <div class="card-body">
+                <form id="invoice-create-form" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label for="client" class="form-label">Client</label>
+                        <select class="form-select" id="client" name="client">
+                            {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.last_name }} {{ client.first_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="appointment_type" class="form-label">Type de RDV</label>
+                        <select class="form-select" id="appointment_type" name="appointment_type">
+                            {% for t in appointment_types %}
+                                <option value="{{ t.id }}" data-price="{{ t.price }}">{{ t.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="price" class="form-label">Prix</label>
+                        <input type="number" class="form-control" id="price" name="price" readonly>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" value="{{ today }}">
+                    </div>
+                    <div class="col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Générer</button>
+                        <button type="button" class="btn btn-outline-success" id="send-invoice-btn"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row g-2 mb-3">
+    <div class="col-md-3 mb-2">
+        <input type="date" class="form-control" id="filter-date" placeholder="Filtrer par date">
+    </div>
+    <div class="col-md-3 mb-2">
+        <select class="form-select" id="filter-client">
+            <option value="">Tous les clients</option>
+            {% for client in clients %}
+                <option value="{{ client.id }}">{{ client.last_name }} {{ client.first_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4 mb-2">
+        <input type="text" class="form-control" id="search-client" placeholder="Recherche client...">
+    </div>
+</div>
+<div class="card shadow-sm border-0 mt-4">
+    <div class="card-header bg-secondary text-white"><i class="fas fa-list"></i> Liste des factures</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="invoice-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Client</th>
+                        <th>Date</th>
+                        <th>Montant</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for invoice in invoices %}
+                    <tr>
+                        <td>{{ invoice.number }}</td>
+                        <td>{{ invoice.client_name }}</td>
+                        <td>{{ invoice.date }}</td>
+                        <td>{{ invoice.amount }} €</td>
+                        <td>
+                            {% if invoice.status == 'brouillon' %}
+                                <span class="badge bg-secondary">Brouillon</span>
+                            {% elif invoice.status == 'envoyée' %}
+                                <span class="badge bg-warning text-dark">Envoyée</span>
+                            {% elif invoice.status == 'payée' %}
+                                <span class="badge bg-success">Payée</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/invoices/{{ invoice.id }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a>
+                            <button class="btn btn-sm btn-outline-secondary send-invoice-btn" data-id="{{ invoice.id }}"><i class="fas fa-paper-plane"></i></button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6" class="text-center text-muted">Aucune facture</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/invoice.js"></script>
+<script>
+// Prix auto depuis type de RDV
+const typeSelect = document.getElementById('appointment_type');
+const priceInput = document.getElementById('price');
+if(typeSelect && priceInput) {
+    typeSelect.addEventListener('change', function() {
+        const selected = typeSelect.options[typeSelect.selectedIndex];
+        priceInput.value = selected.getAttribute('data-price') || '';
+    });
+    // Init
+    if(typeSelect.selectedIndex >= 0) {
+        priceInput.value = typeSelect.options[typeSelect.selectedIndex].getAttribute('data-price') || '';
+    }
+}
+// Recherche instantanée
+const searchInput = document.getElementById('search-client');
+const invoiceTable = document.getElementById('invoice-table');
+if(searchInput && invoiceTable) {
+    searchInput.addEventListener('input', function() {
+        const val = searchInput.value.toLowerCase();
+        for(const row of invoiceTable.tBodies[0].rows) {
+            const client = row.cells[1].textContent.toLowerCase();
+            row.style.display = client.includes(val) ? '' : 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

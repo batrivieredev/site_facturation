@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}Clients{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Gestion des Clients</h2>
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#clientModal"><i class="fas fa-user-plus"></i> Ajouter un client</button>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-4 mb-2">
+        <input type="text" class="form-control" id="search-client" placeholder="Recherche client...">
+    </div>
+</div>
+<div class="card shadow-sm border-0 mt-4">
+    <div class="card-header bg-secondary text-white"><i class="fas fa-users"></i> Liste des clients</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="client-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Statut RDV</th>
+                        <th>Type de RDV</th>
+                        <th>Adresse</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for client in clients %}
+                    <tr>
+                        <td>{{ client.last_name }}</td>
+                        <td>{{ client.first_name }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.phone }}</td>
+                        <td>
+                            {% if client.status == 'honoré' %}
+                                <span class="badge bg-success">Honoré</span>
+                            {% elif client.status == 'reporté' %}
+                                <span class="badge bg-warning text-dark">Reporté</span>
+                            {% elif client.status == 'pas venu' %}
+                                <span class="badge bg-danger">Pas venu</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ client.rdv_type }}</td>
+                        <td>{{ client.address }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary view-client-btn" data-id="{{ client.id }}"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-primary edit-client-btn" data-id="{{ client.id }}"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="8" class="text-center text-muted">Aucun client</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Modal Client -->
+<div class="modal fade" id="clientModal" tabindex="-1" aria-labelledby="clientModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="client-form" method="POST" action="{{ url_for('client.add_client') }}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="clientModalLabel">Ajouter / Modifier un client</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="client-last-name" class="form-label">Nom</label>
+              <input type="text" class="form-control" id="client-last-name" name="last_name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="client-first-name" class="form-label">Prénom</label>
+              <input type="text" class="form-control" id="client-first-name" name="first_name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="client-email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="client-email" name="email" required>
+            </div>
+            <div class="col-md-6">
+              <label for="client-phone" class="form-label">Téléphone</label>
+              <input type="text" class="form-control" id="client-phone" name="phone">
+            </div>
+            <div class="col-12">
+              <label for="client-address" class="form-label">Adresse</label>
+              <input type="text" class="form-control" id="client-address" name="address">
+            </div>
+            <div class="col-md-6">
+              <label for="client-rdv-status" class="form-label">Statut RDV</label>
+              <select class="form-select" id="client-rdv-status" name="rdv_status">
+                <option value="honoré">Honoré</option>
+                <option value="reporté">Reporté</option>
+                <option value="pas venu">Pas venu</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="client-rdv-type" class="form-label">Type de RDV</label>
+              <select class="form-select" id="client-rdv-type" name="rdv_type">
+                {% for t in appointment_types %}
+                  <option value="{{ t.name }}">{{ t.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/client.js"></script>
+<script>
+// Recherche instantanée
+const searchInput = document.getElementById('search-client');
+const clientTable = document.getElementById('client-table');
+if(searchInput && clientTable) {
+    searchInput.addEventListener('input', function() {
+        const val = searchInput.value.toLowerCase();
+        for(const row of clientTable.tBodies[0].rows) {
+            const nom = row.cells[0].textContent.toLowerCase();
+            const prenom = row.cells[1].textContent.toLowerCase();
+            row.style.display = nom.includes(val) || prenom.includes(val) ? '' : 'none';
+        }
+    });
+}
+// Gestion des boutons modifier et voir
+const editButtons = document.querySelectorAll('.edit-client-btn');
+const viewButtons = document.querySelectorAll('.view-client-btn');
+const clientModal = new bootstrap.Modal(document.getElementById('clientModal'));
+
+editButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const row = btn.closest('tr');
+        document.getElementById('client-last-name').value = row.cells[0].textContent.trim();
+        document.getElementById('client-first-name').value = row.cells[1].textContent.trim();
+        document.getElementById('client-email').value = row.cells[2].textContent.trim();
+        document.getElementById('client-phone').value = row.cells[3].textContent.trim();
+        document.getElementById('client-address').value = row.cells[4].textContent.trim();
+        document.getElementById('client-rdv-status').value = row.cells[5].textContent.trim();
+        document.getElementById('client-rdv-type').value = row.cells[6].textContent.trim();
+        // Change form action to edit route
+        document.getElementById('client-form').action = `/clients/edit/${btn.getAttribute('data-id')}`;
+        clientModal.show();
+    });
+});
+
+viewButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const row = btn.closest('tr');
+        document.getElementById('client-last-name').value = row.cells[0].textContent.trim();
+        document.getElementById('client-first-name').value = row.cells[1].textContent.trim();
+        document.getElementById('client-email').value = row.cells[2].textContent.trim();
+        document.getElementById('client-phone').value = row.cells[3].textContent.trim();
+        document.getElementById('client-address').value = row.cells[4].textContent.trim();
+        document.getElementById('client-rdv-status').value = row.cells[5].textContent.trim();
+        document.getElementById('client-rdv-type').value = row.cells[6].textContent.trim();
+        // Désactive le formulaire pour consultation
+        document.getElementById('client-form').action = '#';
+        clientModal.show();
+    });
+});
+</script>
+{% endblock %}

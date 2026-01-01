@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% block title %}Paramètres{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white"><i class="fas fa-building"></i> Informations entreprise</div>
+            <div class="card-body">
+                <form id="company-form">
+                    <div class="mb-3">
+                        <label for="company-siret" class="form-label">SIRET</label>
+                        <input type="text" class="form-control" id="company-siret" name="siret" value="{{ settings.siret }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="company-name" class="form-label">Nom / Prénom</label>
+                        <input type="text" class="form-control" id="company-name" name="name" value="{{ settings.name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="company-address" class="form-label">Adresse</label>
+                        <input type="text" class="form-control" id="company-address" name="address" value="{{ settings.address }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="company-phone" class="form-label">Téléphone</label>
+                        <input type="text" class="form-control" id="company-phone" name="phone" value="{{ settings.phone }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="company-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="company-email" name="email" value="{{ settings.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="company-logo" class="form-label">Logo</label>
+                        <input type="file" class="form-control" id="company-logo" name="logo">
+                        {% if settings.logo_url %}
+                        <img src="{{ settings.logo_url }}" alt="Logo" class="img-thumbnail mt-2" style="max-height: 80px;">
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-secondary text-white"><i class="fas fa-envelope"></i> Paramètres e-mail</div>
+            <div class="card-body">
+                <form id="mail-settings-form">
+                    <div class="mb-3">
+                        <label for="smtp-server" class="form-label">SMTP Serveur</label>
+                        <input type="text" class="form-control" id="smtp-server" name="smtp_server" value="{{ mail_settings.smtp_server }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="smtp-port" class="form-label">SMTP Port</label>
+                        <input type="number" class="form-control" id="smtp-port" name="smtp_port" value="{{ mail_settings.smtp_port }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="smtp-user" class="form-label">SMTP User</label>
+                        <input type="text" class="form-control" id="smtp-user" name="smtp_user" value="{{ mail_settings.smtp_user }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="smtp-password" class="form-label">SMTP Password</label>
+                        <input type="password" class="form-control" id="smtp-password" name="smtp_password" value="{{ mail_settings.smtp_password }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="imap-server" class="form-label">IMAP Serveur</label>
+                        <input type="text" class="form-control" id="imap-server" name="imap_server" value="{{ mail_settings.imap_server }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="imap-port" class="form-label">IMAP Port</label>
+                        <input type="number" class="form-control" id="imap-port" name="imap_port" value="{{ mail_settings.imap_port }}">
+                    </div>
+                    <button type="button" class="btn btn-outline-primary" id="test-mail-btn">Tester connexion</button>
+                    <button type="submit" class="btn btn-primary ms-2">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-info text-white"><i class="fas fa-calendar-alt"></i> Types de RDV</div>
+            <div class="card-body">
+                <form id="rdv-type-form" class="row g-3 align-items-end" method="POST" action="{{ url_for('settings.add_appointment_type') }}">
+                    <div class="col-md-4">
+                        <label for="rdv-type-name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="rdv-type-name" name="name">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="rdv-type-price" class="form-label">Prix</label>
+                        <input type="number" class="form-control" id="rdv-type-price" name="price">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="rdv-type-duration" class="form-label">Durée (min)</label>
+                        <input type="number" class="form-control" id="rdv-type-duration" name="duration">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </form>
+                <div class="table-responsive mt-3">
+                    <table class="table table-hover align-middle mb-0" id="rdv-type-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prix</th>
+                                <th>Durée</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for t in appointment_types %}
+                            <tr>
+                                <td>{{ t.name }}</td>
+                                <td>{{ t.price }} €</td>
+                                <td>{{ t.duration }} min</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary edit-rdv-type-btn" data-id="{{ t.id }}"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="4" class="text-center text-muted">Aucun type de RDV</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal édition type RDV -->
+<div class="modal fade" id="editRdvTypeModal" tabindex="-1" aria-labelledby="editRdvTypeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="edit-rdv-type-form" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editRdvTypeModalLabel">Modifier le type de RDV</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-type-id" name="type_id">
+          <div class="mb-3">
+            <label for="edit-type-name" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="edit-type-name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="edit-type-price" class="form-label">Prix</label>
+            <input type="number" class="form-control" id="edit-type-price" name="price" required>
+          </div>
+          <div class="mb-3">
+            <label for="edit-type-duration" class="form-label">Durée (min)</label>
+            <input type="number" class="form-control" id="edit-type-duration" name="duration" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/settings.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const editButtons = document.querySelectorAll('.edit-rdv-type-btn');
+    editButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const row = btn.closest('tr');
+        const id = btn.getAttribute('data-id');
+        const name = row.querySelector('td:nth-child(1)').textContent.trim();
+        const price = row.querySelector('td:nth-child(2)').textContent.trim().replace(' €','');
+        const duration = row.querySelector('td:nth-child(3)').textContent.trim().replace(' min','');
+        document.getElementById('edit-type-id').value = id;
+        document.getElementById('edit-type-name').value = name;
+        document.getElementById('edit-type-price').value = price;
+        document.getElementById('edit-type-duration').value = duration;
+        const form = document.getElementById('edit-rdv-type-form');
+        form.action = `/settings/edit_appointment_type/${id}`;
+        var modal = new bootstrap.Modal(document.getElementById('editRdvTypeModal'));
+        modal.show();
+      });
+    });
+  });
+</script>
+{% endblock %}

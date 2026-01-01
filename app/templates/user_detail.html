@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Modifier utilisateur{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Modifier utilisateur</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="role" class="form-label">Rôle</label>
+            <select class="form-select" id="role" name="role">
+                {% for role in roles %}
+                <option value="{{ role.name }}" {% if user.role_id == role.id %}selected{% endif %}>{{ role.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Nouveau mot de passe (laisser vide pour ne pas changer)</label>
+            <input type="password" class="form-control" id="password" name="password">
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="{{ url_for('admin.admin_users') }}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}
