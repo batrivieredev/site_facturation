@@ -42,13 +42,20 @@ def invoices():
     query = Invoice.query
     client_id = request.args.get('client_id')
     status = request.args.get('status')
-    search = request.args.get('search')
+    search_name = request.args.get('search_name')
+    search_date = request.args.get('search_date')
     if client_id:
         query = query.filter_by(client_id=client_id)
     if status:
         query = query.filter_by(status=status)
-    if search:
-        query = query.filter(Invoice.number.ilike(f"%{search}%"))
+    if search_name:
+        query = query.join(Client).filter(
+            (Invoice.number.ilike(f"%{search_name}%")) |
+            (Client.last_name.ilike(f"%{search_name}%")) |
+            (Client.first_name.ilike(f"%{search_name}%"))
+        )
+    if search_date:
+        query = query.filter(db.cast(Invoice.date, db.String).like(f"{search_date}%"))
     invoices = query.order_by(Invoice.date.desc()).all()
     appointment_types = AppointmentType.query.order_by(AppointmentType.name).all()
     clients = Client.query.order_by(Client.last_name, Client.first_name).all()
@@ -93,7 +100,7 @@ def create_invoice():
         number=number,
         date=datetime.datetime.strptime(date, "%Y-%m-%d") if date else datetime.datetime.now(),
         status='brouillon',
-        total=price,
+        total=0,
         payment_method=payment_method
     )
     db.session.add(invoice)
@@ -106,6 +113,9 @@ def create_invoice():
         total=appointment_type.price,
     )
     db.session.add(item)
+    db.session.flush()
+    # Met à jour le total de la facture avec la somme des items
+    invoice.total = sum(i.total for i in invoice.items)
     db.session.commit()
     flash('Facture créée avec succès.', 'success')
     return redirect(url_for('invoice.invoices'))

@@ -138,6 +138,213 @@
         </div>
     </div>
 </div>
+
+<!-- Gestion des fichiers d'attachement -->
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-info text-white"><i class="fas fa-paperclip"></i> Pièces jointes disponibles pour les mails</div>
+  <div class="card-body">
+    <form id="attachment-upload-form" class="row g-3 align-items-end" method="POST" action="/settings/upload_attachment" enctype="multipart/form-data">
+      <div class="col-md-8">
+        <input type="file" class="form-control" id="attachment-file" name="attachment">
+      </div>
+      <div class="col-md-4">
+        <button type="submit" class="btn btn-info">Ajouter</button>
+      </div>
+    </form>
+    <div class="table-responsive mt-3">
+      <table class="table table-hover align-middle mb-0" id="attachment-table">
+        <thead>
+          <tr>
+            <th>Nom du fichier</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="attachment-list">
+          {% for f in attachments %}
+          <tr>
+            <td>{{ f }}</td>
+            <td>
+              <form method="POST" action="/settings/delete_attachment" style="display:inline;">
+                <input type="hidden" name="filename" value="{{ f }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="2" class="text-center text-muted">Aucun fichier</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CRUD Mail Templates -->
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-warning text-dark"><i class="fas fa-file-alt"></i> Mails types</div>
+  <div class="card-body">
+    <form id="mail-template-form" class="row g-3 align-items-end" method="POST" action="/settings/add_mail_template">
+      <div class="col-md-3">
+        <label for="template-name" class="form-label">Nom</label>
+        <input type="text" class="form-control" id="template-name" name="name">
+      </div>
+      <div class="col-md-4">
+        <label for="template-subject" class="form-label">Objet</label>
+        <input type="text" class="form-control" id="template-subject" name="subject">
+      </div>
+      <div class="col-md-3">
+        <label for="template-body" class="form-label">Contenu</label>
+        <input type="text" class="form-control" id="template-body" name="body">
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-warning">Ajouter</button>
+      </div>
+    </form>
+    <div class="table-responsive mt-3">
+      <table class="table table-hover align-middle mb-0" id="mail-template-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Objet</th>
+            <th>Contenu</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for t in mail_templates %}
+          <tr>
+            <td>{{ t.name }}</td>
+            <td>{{ t.subject }}</td>
+            <td>{{ t.body }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary edit-mail-template-btn" data-id="{{ t.id }}"><i class="fas fa-edit"></i></button>
+            </td>
+            <td>
+              <form method="POST" action="/delete_mail_template/{{ t.id }}" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-outline-danger ms-1">Supprimer</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="text-center text-muted">Aucun mail type</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal édition mail type -->
+<div class="modal fade" id="editMailTemplateModal" tabindex="-1" aria-labelledby="editMailTemplateModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="edit-mail-template-form" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editMailTemplateModalLabel">Modifier le mail type</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-template-id" name="template_id">
+          <div class="mb-3">
+            <label for="edit-template-name" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="edit-template-name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="edit-template-subject" class="form-label">Objet</label>
+            <input type="text" class="form-control" id="edit-template-subject" name="subject">
+          </div>
+          <div class="mb-3">
+            <label for="edit-template-body" class="form-label">Contenu</label>
+            <textarea class="form-control" id="edit-template-body" name="body" rows="5"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- CRUD Mail Signatures -->
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-success text-white"><i class="fas fa-signature"></i> Signatures</div>
+  <div class="card-body">
+    <form id="mail-signature-form" class="row g-3 align-items-end" method="POST" action="/settings/add_mail_signature">
+      <div class="col-md-4">
+        <label for="signature-name" class="form-label">Nom</label>
+        <input type="text" class="form-control" id="signature-name" name="name">
+      </div>
+      <div class="col-md-6">
+        <label for="signature-body" class="form-label">Signature</label>
+        <input type="text" class="form-control" id="signature-body" name="signature">
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-success">Ajouter</button>
+      </div>
+    </form>
+    <div class="table-responsive mt-3">
+      <table class="table table-hover align-middle mb-0" id="mail-signature-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Signature</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for s in mail_signatures %}
+          <tr>
+            <td>{{ s.name }}</td>
+            <td>{{ s.signature }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary edit-mail-signature-btn" data-id="{{ s.id }}"><i class="fas fa-edit"></i></button>
+            </td>
+            <td>
+              <form method="POST" action="/delete_mail_signature/{{ s.id }}" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-outline-danger ms-1">Supprimer</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4" class="text-center text-muted">Aucune signature</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal édition signature -->
+<div class="modal fade" id="editMailSignatureModal" tabindex="-1" aria-labelledby="editMailSignatureModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="edit-mail-signature-form" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editMailSignatureModalLabel">Modifier la signature</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-signature-id" name="signature_id">
+          <div class="mb-3">
+            <label for="edit-signature-name" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="edit-signature-name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="edit-signature-body" class="form-label">Signature</label>
+            <textarea class="form-control" id="edit-signature-body" name="signature" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Modal édition type RDV -->
 <div class="modal fade" id="editRdvTypeModal" tabindex="-1" aria-labelledby="editRdvTypeModalLabel" aria-hidden="true">
   <div class="modal-dialog">

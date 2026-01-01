@@ -61,22 +61,19 @@
         </div>
     </div>
 </div>
-<div class="row g-2 mb-3">
-    <div class="col-md-3 mb-2">
-        <input type="date" class="form-control" id="filter-date" placeholder="Filtrer par date">
-    </div>
-    <div class="col-md-3 mb-2">
-        <select class="form-select" id="filter-client">
-            <option value="">Tous les clients</option>
-            {% for client in clients %}
-                <option value="{{ client.id }}">{{ client.last_name }} {{ client.first_name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="col-md-4 mb-2">
-        <input type="text" class="form-control" id="search-client" placeholder="Recherche client...">
-    </div>
-</div>
+<!-- Filtres supprimés -->
+<form class="row g-3 mb-3" method="get" action="">
+  <div class="col-md-4">
+    <input type="text" class="form-control" name="search_name" placeholder="Recherche client ou numéro">
+  </div>
+  <div class="col-md-3">
+    <input type="date" class="form-control" name="search_date">
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-outline-primary w-100">Rechercher</button>
+  </div>
+</form>
+
 <div class="card shadow-sm border-0 mt-4">
     <div class="card-header bg-secondary text-white"><i class="fas fa-list"></i> Liste des factures</div>
     <div class="card-body p-0">
