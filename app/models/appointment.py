@@ -7,7 +7,6 @@ class AppointmentType(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(255))  # description for invoices
     price = db.Column(db.Numeric(10, 2), nullable=False)
-    duration = db.Column(db.Integer)  # duration in minutes
     agenda_link_id = db.Column(db.Integer, db.ForeignKey('agenda_links.id'))
     appointments = db.relationship('Appointment', backref='type', lazy=True)
 

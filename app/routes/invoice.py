@@ -17,11 +17,15 @@ def view_invoice(invoice_id):
         return render_template('invoice_view.html', invoice=invoice, client=client, items=items, company=company)
     if request.method == 'POST':
         new_status = request.form.get('status')
-        if new_status in ['brouillon', 'validée', 'envoyée']:
+        # No required fields check, just update status if valid
+        if new_status in ['brouillon', 'validée', 'envoyée', 'payée']:
             invoice.status = new_status
             db.session.commit()
             flash('Statut de la facture mis à jour.', 'success')
-        return redirect(url_for('invoice.view_invoice', invoice_id=invoice_id))
+            return redirect(url_for('invoice.invoices'))
+        else:
+            flash('Statut invalide.', 'danger')
+            return redirect(url_for('invoice.view_invoice', invoice_id=invoice_id))
     # Add rdv_type_description for client if possible
     if hasattr(client, 'rdv_type') and client.rdv_type:
         # Try to get description from AppointmentType
@@ -52,42 +56,54 @@ def invoices():
     for invoice in invoices:
         invoice.client_name = invoice.client.last_name + ' ' + invoice.client.first_name if invoice.client else ''
         invoice.amount = invoice.total if hasattr(invoice, 'total') else 0
+        invoice.status_display = invoice.status if hasattr(invoice, 'status') else ''
     return render_template('invoices.html', invoices=invoices, appointment_types=appointment_types, clients=clients)
 
 @invoice_bp.route('/invoices', methods=['POST'])
 def create_invoice():
     from flask import request, redirect, url_for, flash
+    # Si la requête contient uniquement 'status', c'est une modification de statut, on redirige vers la vue facture
+    if set(request.form.keys()) == {'status'}:
+        invoice_id = request.args.get('invoice_id') or request.form.get('invoice_id')
+        if invoice_id:
+            return redirect(url_for('invoice.invoices'))
+        return redirect(url_for('invoice.invoices'))
+    # Sinon, c'est une création de facture
+    if 'client' not in request.form:
+        return redirect(url_for('invoice.invoices'))
     client_id = request.form.get('client')
     appointment_type_id = request.form.get('appointment_type')
     price = request.form.get('price')
     date = request.form.get('date')
-    if not client_id or not appointment_type_id or not price or not date:
-        flash('Tous les champs sont obligatoires.', 'danger')
-        return redirect(url_for('invoice.invoices'))
+    payment_method = request.form.get('payment_method')
     from app.models import AppointmentType, InvoiceItem
     appointment_type = AppointmentType.query.get(appointment_type_id)
-    if not appointment_type:
-        flash('Type de RDV invalide.', 'danger')
-        return redirect(url_for('invoice.invoices'))
     from app.models.invoice import Invoice
     import datetime
+    now = datetime.datetime.now()
+    year = now.year
+    month = f"{now.month:02d}"
+    chrono = Invoice.query.filter(db.extract('year', Invoice.date) == year, db.extract('month', Invoice.date) == now.month).count() + 1
+    number = f"F{year}{month}-{chrono}"
+    if not client_id or not price or not payment_method:
+        flash("Tous les champs obligatoires doivent être remplis pour créer une facture.", "danger")
+        return redirect(url_for('invoice.invoices'))
     invoice = Invoice(
         client_id=client_id,
-        number=f"F{int(datetime.datetime.now().timestamp())}",
-        date=datetime.datetime.strptime(date, "%Y-%m-%d"),
+        number=number,
+        date=datetime.datetime.strptime(date, "%Y-%m-%d") if date else datetime.datetime.now(),
         status='brouillon',
-        total=price
+        total=price,
+        payment_method=payment_method
     )
     db.session.add(invoice)
     db.session.flush()  # Get invoice.id before commit
-    # Add invoice item with appointment type details
     item = InvoiceItem(
         invoice_id=invoice.id,
         description=appointment_type.description or appointment_type.name,
         quantity=1,
         unit_price=appointment_type.price,
         total=appointment_type.price,
-        # Optionally add duration if you want to display it in the template
     )
     db.session.add(item)
     db.session.commit()
@@ -141,6 +157,9 @@ def send_invoice(invoice_id):
 def delete_invoice(invoice_id):
     from flask import redirect, url_for, flash
     invoice = Invoice.query.get_or_404(invoice_id)
+    # Supprimer d'abord tous les items liés à la facture
+    for item in invoice.items:
+        db.session.delete(item)
     db.session.delete(invoice)
     db.session.commit()
     flash('Facture supprimée avec succès.', 'success')

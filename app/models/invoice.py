@@ -9,6 +9,7 @@ class Invoice(db.Model):
     date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='brouillon')  # brouillon, envoyée, payée
     total = db.Column(db.Numeric(10, 2), nullable=False)
+    payment_method = db.Column(db.String(20), nullable=True)  # espece, cheque, virement, carte
     items = db.relationship('InvoiceItem', backref='invoice', lazy=True)
     payments = db.relationship('Payment', backref='invoice', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -81,6 +81,8 @@
                                 <td>
                                     {% if invoice.status == 'brouillon' %}
                                         <span class="badge bg-secondary">Brouillon</span>
+                                    {% elif invoice.status == 'validée' %}
+                                        <span class="badge bg-primary">Validée</span>
                                     {% elif invoice.status == 'envoyée' %}
                                         <span class="badge bg-warning text-dark">Envoyée</span>
                                     {% elif invoice.status == 'payée' %}

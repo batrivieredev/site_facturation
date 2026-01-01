@@ -55,14 +55,12 @@ def add_appointment_type():
     name = request.form.get('name')
     description = request.form.get('description')
     price = request.form.get('price')
-    duration = request.form.get('duration')
-    if not name or not price or not duration:
+    if not name or not price:
         flash('Tous les champs sont obligatoires.', 'danger')
         return redirect(url_for('settings.settings'))
     try:
         price = float(price)
-        duration = int(duration)
-        new_type = AppointmentType(name=name, description=description, price=price, duration=duration)
+        new_type = AppointmentType(name=name, description=description, price=price)
         db.session.add(new_type)
         db.session.commit()
         flash('Type de rendez-vous ajouté avec succès.', 'success')
@@ -77,19 +75,16 @@ def edit_appointment_type(type_id):
     name = request.form.get('name')
     description = request.form.get('description')
     price = request.form.get('price')
-    duration = request.form.get('duration')
-    if not name or not price or not duration:
+    if not name or not price:
         flash('Tous les champs sont obligatoires.', 'danger')
         return redirect(url_for('settings.settings'))
     try:
         price = float(price)
-        duration = int(duration)
         appointment_type = AppointmentType.query.get(type_id)
         if appointment_type:
             appointment_type.name = name
             appointment_type.description = description
             appointment_type.price = price
-            appointment_type.duration = duration
             db.session.commit()
             flash('Type de rendez-vous modifié avec succès.', 'success')
         else:

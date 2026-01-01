@@ -13,12 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = row.querySelector('td:nth-child(1)').textContent.trim();
             const description = row.querySelector('td:nth-child(2)').textContent.trim();
             const price = row.querySelector('td:nth-child(3)').textContent.trim().replace(' €','');
-            const duration = row.querySelector('td:nth-child(4)').textContent.trim().replace(' min','');
             document.getElementById('edit-type-id').value = id;
             document.getElementById('edit-type-name').value = name;
             document.getElementById('edit-type-description').value = description;
             document.getElementById('edit-type-price').value = price;
-            document.getElementById('edit-type-duration').value = duration;
             const form = document.getElementById('edit-rdv-type-form');
             form.action = `/settings/edit_appointment_type/${id}`;
             var modal = new bootstrap.Modal(document.getElementById('editRdvTypeModal'));

@@ -1,11 +1,24 @@
 /* -----------------------------
    GLOBAL
 ----------------------------- */
+:root {
+    --primary-invoice: #549A7A;
+    --secondary-invoice: #9A5474;
+}
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa; /* gris très clair */
-    color: #343a40;
+    background-color: #f8f9fa !important; /* gris très clair */
+    color: var(--secondary-invoice);
 }
+
+@media print {
+  body {
+    background-color: #fff !important;
+    color: #343a40 !important;
+  }
+}
+
+
 
 h2 {
     font-weight: 600;
@@ -45,38 +58,38 @@ h2 {
    BUTTONS
 ----------------------------- */
 .btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    background-color: var(--primary-invoice) !important;
+    border-color: var(--primary-invoice) !important;
 }
 
 .btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
+    background-color: var(--secondary-invoice) !important;
+    border-color: var(--secondary-invoice) !important;
 }
 
 .btn-outline-primary {
-    color: #0d6efd;
-    border-color: #0d6efd;
+    color: var(--primary-invoice) !important;
+    border-color: var(--primary-invoice) !important;
 }
 
 .btn-outline-primary:hover {
-    background-color: #0d6efd;
-    color: #fff;
+    background-color: var(--primary-invoice) !important;
+    color: #fff !important;
 }
 
 .btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
+    background-color: var(--secondary-invoice) !important;
+    border-color: var(--secondary-invoice) !important;
 }
 
 .btn-outline-secondary {
-    color: #6c757d;
-    border-color: #6c757d;
+    color: var(--secondary-invoice) !important;
+    border-color: var(--secondary-invoice) !important;
 }
 
 .btn-outline-secondary:hover {
-    background-color: #6c757d;
-    color: #fff;
+    background-color: var(--secondary-invoice) !important;
+    color: #fff !important;
 }
 
 /* -----------------------------
@@ -120,11 +133,11 @@ input.form-control:focus, select.form-select:focus, textarea.form-control:focus 
 }
 
 .badge.bg-success {
-    background-color: #198754 !important;
+    background-color: var(--primary-invoice) !important;
 }
 
 .badge.bg-danger {
-    background-color: #dc3545 !important;
+    background-color: var(--secondary-invoice) !important;
 }
 
 .badge.bg-warning {
@@ -133,12 +146,12 @@ input.form-control:focus, select.form-select:focus, textarea.form-control:focus 
 }
 
 .badge.bg-info {
-    background-color: #0dcaf0 !important;
-    color: #212529 !important;
+    background-color: var(--primary-invoice) !important;
+    color: #fff !important;
 }
 
 .badge.bg-secondary {
-    background-color: #6c757d !important;
+    background-color: var(--secondary-invoice) !important;
 }
 
 /* -----------------------------
@@ -165,7 +178,7 @@ input.form-control:focus, select.form-select:focus, textarea.form-control:focus 
 }
 
 .navbar .nav-link:hover {
-    color: #0d6efd;
+    color: var(--primary-invoice);
 }
 
 /* -----------------------------

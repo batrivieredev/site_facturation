@@ -1,15 +1,42 @@
 body { background: #fff; }
 .invoice-container { max-width: 800px; margin: 40px auto; background: #fff; padding: 32px 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); font-family: 'Segoe UI', Arial, sans-serif; }
-.invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+
+@media print {
+  nav, .navbar, .sidebar, .footer, .btn, .input-group, form, .mt-3, .mt-4, .mt-2, .shadow-sm, .border-0, .d-print-none {
+    display: none !important;
+  }
+  body, html {
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+  .invoice-container {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .card, .card-header, .card-body {
+    box-shadow: none !important;
+    border: none !important;
+    background: #fff !important;
+  }
+:root {
+  --primary-invoice: #549A7A;
+  --secondary-invoice: #9A5474;
+}
+}
+.invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; background: var(--primary-invoice); color: #fff; border-radius: 8px 8px 0 0; }
 .company-info { display: flex; align-items: flex-start; }
 .company-logo { max-height: 70px; margin-right: 24px; }
 .company-details { font-size: 15px; }
-.company-name { font-size: 20px; font-weight: bold; margin-bottom: 2px; }
+.company-name { font-size: 20px; font-weight: bold; margin-bottom: 2px; color: var(--secondary-invoice); }
 .company-status { font-size: 13px; color: #888; margin-bottom: 2px; }
 .company-siret, .company-address, .company-phone, .company-email { font-size: 13px; color: #444; }
 .invoice-info { background: #f5f5f5; border-radius: 6px; padding: 16px 24px; min-width: 220px; text-align: right; }
 .invoice-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
-.invoice-number, .invoice-date, .invoice-status { font-size: 14px; color: #333; }
+.invoice-number, .invoice-date, .invoice-status { font-size: 14px; color: var(--secondary-invoice); }
 .client-block { margin-bottom: 28px; }
 .client-title { font-weight: bold; font-size: 15px; margin-bottom: 2px; }
 .client-name { font-size: 16px; margin-bottom: 2px; }
@@ -17,12 +44,12 @@ body { background: #fff; }
 .invoice-table-block { margin-bottom: 28px; }
 .invoice-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .invoice-table th, .invoice-table td { border: 1px solid #e0e0e0; padding: 8px 10px; text-align: left; }
-.invoice-table th { background: #f0f0f0; font-weight: 600; }
+.invoice-table th { background: var(--primary-invoice); color: #fff; font-weight: 600; }
 .invoice-table td { background: #fff; }
 .invoice-totals { margin-bottom: 24px; text-align: right; }
 .totals-row { font-size: 15px; margin-bottom: 2px; }
-.total-main { font-size: 18px; font-weight: bold; color: #1a7f37; margin-top: 8px; }
-.invoice-footer { border-top: 1px solid #e0e0e0; padding-top: 12px; font-size: 12px; color: #888; text-align: center; }
+.total-main { font-size: 18px; font-weight: bold; color: var(--secondary-invoice); margin-top: 8px; }
+.invoice-footer { border-top: 1px solid var(--secondary-invoice); padding-top: 12px; font-size: 12px; color: var(--secondary-invoice); text-align: center; }
 .footer-company { margin-bottom: 2px; }
 .footer-mentions { margin-bottom: 2px; }
 .footer-pagination { color: #aaa; }
