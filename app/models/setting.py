@@ -14,3 +14,4 @@ class Setting(db.Model):
     logo = db.Column(db.String(255))  # path to uploaded logo
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    google_agenda_url = db.Column(db.String(255))  # Google Calendar link

@@ -36,6 +36,10 @@
                         <input type="email" class="form-control" id="company-email" name="email" value="{{ settings.email }}">
                     </div>
                     <div class="mb-3">
+                        <label for="google-agenda-url" class="form-label">Lien Google Agenda</label>
+                        <input type="url" class="form-control" id="google-agenda-url" name="google_agenda_url" value="{{ settings.google_agenda_url }}">
+                    </div>
+                    <div class="mb-3">
                         <label for="company-logo" class="form-label">Logo</label>
                         <input type="file" class="form-control" id="company-logo" name="logo">
                         {% if logo_url %}
@@ -85,17 +89,21 @@
             <div class="card-header bg-info text-white"><i class="fas fa-calendar-alt"></i> Types de RDV</div>
             <div class="card-body">
                 <form id="rdv-type-form" class="row g-3 align-items-end" method="POST" action="{{ url_for('settings.add_appointment_type') }}">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="rdv-type-name" class="form-label">Nom</label>
                         <input type="text" class="form-control" id="rdv-type-name" name="name">
                     </div>
                     <div class="col-md-3">
+                        <label for="rdv-type-description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="rdv-type-description" name="description">
+                    </div>
+                    <div class="col-md-2">
                         <label for="rdv-type-price" class="form-label">Prix</label>
                         <input type="number" class="form-control" id="rdv-type-price" name="price">
                     </div>
-                    <div class="col-md-3">
-                        <label for="rdv-type-duration" class="form-label">Durée (min)</label>
-                        <input type="number" class="form-control" id="rdv-type-duration" name="duration">
+                    <div class="col-md-2">
+                        <!-- <label for="rdv-type-duration" class="form-label">Durée (min)</label>
+                        <input type="number" class="form-control" id="rdv-type-duration" name="duration"> -->
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-primary">Ajouter</button>
@@ -106,8 +114,8 @@
                         <thead>
                             <tr>
                                 <th>Nom</th>
+                                <th>Description</th>
                                 <th>Prix</th>
-                                <th>Durée</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -115,8 +123,8 @@
                         {% for t in appointment_types %}
                             <tr>
                                 <td>{{ t.name }}</td>
+                                <td>{{ t.description }}</td>
                                 <td>{{ t.price }} €</td>
-                                <td>{{ t.duration }} min</td>
                                 <td>
                                     <button class="btn btn-sm btn-outline-primary edit-rdv-type-btn" data-id="{{ t.id }}"><i class="fas fa-edit"></i></button>
                                 </td>
@@ -147,45 +155,27 @@
             <input type="text" class="form-control" id="edit-type-name" name="name" required>
           </div>
           <div class="mb-3">
+            <label for="edit-type-description" class="form-label">Description</label>
+            <input type="text" class="form-control" id="edit-type-description" name="description">
+          </div>
+          <div class="mb-3">
             <label for="edit-type-price" class="form-label">Prix</label>
             <input type="number" class="form-control" id="edit-type-price" name="price" required>
           </div>
           <div class="mb-3">
-            <label for="edit-type-duration" class="form-label">Durée (min)</label>
-            <input type="number" class="form-control" id="edit-type-duration" name="duration" required>
-          </div>
+            <!-- <label for="edit-type-duration" class="form-label">Durée (min)</label>
+            <input type="number" class="form-control" id="edit-type-duration" name="duration" required> -->
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-          <button type="submit" class="btn btn-primary">Enregistrer</button>
-        </div>
-      </form>
     </div>
-  </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+</form>
+</div>
+</div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script src="/static/js/settings.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const editButtons = document.querySelectorAll('.edit-rdv-type-btn');
-    editButtons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const row = btn.closest('tr');
-        const id = btn.getAttribute('data-id');
-        const name = row.querySelector('td:nth-child(1)').textContent.trim();
-        const price = row.querySelector('td:nth-child(2)').textContent.trim().replace(' €','');
-        const duration = row.querySelector('td:nth-child(3)').textContent.trim().replace(' min','');
-        document.getElementById('edit-type-id').value = id;
-        document.getElementById('edit-type-name').value = name;
-        document.getElementById('edit-type-price').value = price;
-        document.getElementById('edit-type-duration').value = duration;
-        const form = document.getElementById('edit-rdv-type-form');
-        form.action = `/settings/edit_appointment_type/${id}`;
-        var modal = new bootstrap.Modal(document.getElementById('editRdvTypeModal'));
-        modal.show();
-      });
-    });
-  });
-</script>
 {% endblock %}

@@ -6,7 +6,7 @@
         <div class="card shadow-sm border-0 text-center h-100">
             <div class="card-body">
                 <h6 class="text-muted text-uppercase">CA du jour</h6>
-                <div class="h3 fw-bold"><i class="fas fa-euro-sign fs-2 text-primary"></i> {{ revenue_today }}</div>
+                <div class="h3 fw-bold"><i class="fas fa-euro-sign fs-2 text-primary"></i> <span id="ca-day">{{ stats.day }}</span></div>
             </div>
         </div>
     </div>
@@ -14,7 +14,7 @@
         <div class="card shadow-sm border-0 text-center h-100">
             <div class="card-body">
                 <h6 class="text-muted text-uppercase">CA semaine</h6>
-                <div class="h3 fw-bold"><i class="fas fa-calendar-week fs-2 text-primary"></i> {{ revenue_week }}</div>
+                <div class="h3 fw-bold"><i class="fas fa-calendar-week fs-2 text-primary"></i> <span id="ca-week">{{ stats.week }}</span></div>
             </div>
         </div>
     </div>
@@ -22,7 +22,7 @@
         <div class="card shadow-sm border-0 text-center h-100">
             <div class="card-body">
                 <h6 class="text-muted text-uppercase">CA mois</h6>
-                <div class="h3 fw-bold"><i class="fas fa-calendar-alt fs-2 text-primary"></i> {{ revenue_month }}</div>
+                <div class="h3 fw-bold"><i class="fas fa-calendar-alt fs-2 text-primary"></i> <span id="ca-month">{{ stats.month }}</span></div>
             </div>
         </div>
     </div>
@@ -30,7 +30,7 @@
         <div class="card shadow-sm border-0 text-center h-100">
             <div class="card-body">
                 <h6 class="text-muted text-uppercase">CA année</h6>
-                <div class="h3 fw-bold"><i class="fas fa-calendar fs-2 text-primary"></i> {{ revenue_year }}</div>
+                <div class="h3 fw-bold"><i class="fas fa-calendar fs-2 text-primary"></i> <span id="ca-year">{{ stats.year }}</span></div>
             </div>
         </div>
     </div>
@@ -43,15 +43,16 @@
                 <span class="badge bg-info">MAJ auto 2 min</span>
             </div>
             <div class="card-body">
-                {% if next_appointment %}
-                <div class="mb-2 fw-semibold">Client : {{ next_appointment.client_name }}</div>
+                {% if error_message %}
+                <div class="alert alert-warning">{{ error_message }}</div>
+                {% elif next_appointment %}
+                <div class="mb-2 fw-semibold">Prochain RDV le : {{ next_appointment.date }} à {{ next_appointment.time }}</div>
+                <div class="mb-2">Client : {{ next_appointment.client_name }}</div>
                 <div class="mb-2">Type : <span class="badge bg-info">{{ next_appointment.type }}</span></div>
-                <div class="mb-2 text-muted">Date : {{ next_appointment.date }}</div>
-                <div class="mb-2 text-muted">Heure : {{ next_appointment.time }}</div>
+                {% if next_appointment.description %}<div class="mb-2 text-muted">Description : {{ next_appointment.description }}</div>{% endif %}
                 {% else %}
                 <small class="text-muted">Aucun rendez-vous à venir</small>
                 {% endif %}
-                <a href="https://calendar.google.com" target="_blank" class="btn btn-outline-primary btn-sm mt-3"><i class="fab fa-google"></i> Voir l'agenda</a>
             </div>
         </div>
     </div>

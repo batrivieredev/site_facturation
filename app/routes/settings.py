@@ -19,6 +19,7 @@ def settings():
         phone = request.form.get('phone')
         email = request.form.get('email')
         logo_file = request.files.get('logo')
+        google_agenda_url = request.form.get('google_agenda_url')
         if not settings:
             settings = Setting()
             db.session.add(settings)
@@ -29,6 +30,7 @@ def settings():
         settings.address = address
         settings.phone = phone
         settings.email = email
+        settings.google_agenda_url = google_agenda_url
         import os
         if logo_file and logo_file.filename:
             filename = logo_file.filename.replace(' ', '_')
@@ -51,6 +53,7 @@ def settings():
 def add_appointment_type():
     from flask import request, redirect, url_for, flash
     name = request.form.get('name')
+    description = request.form.get('description')
     price = request.form.get('price')
     duration = request.form.get('duration')
     if not name or not price or not duration:
@@ -59,7 +62,7 @@ def add_appointment_type():
     try:
         price = float(price)
         duration = int(duration)
-        new_type = AppointmentType(name=name, price=price, duration=duration)
+        new_type = AppointmentType(name=name, description=description, price=price, duration=duration)
         db.session.add(new_type)
         db.session.commit()
         flash('Type de rendez-vous ajouté avec succès.', 'success')
@@ -72,6 +75,7 @@ def add_appointment_type():
 def edit_appointment_type(type_id):
     from flask import request, redirect, url_for, flash
     name = request.form.get('name')
+    description = request.form.get('description')
     price = request.form.get('price')
     duration = request.form.get('duration')
     if not name or not price or not duration:
@@ -83,6 +87,7 @@ def edit_appointment_type(type_id):
         appointment_type = AppointmentType.query.get(type_id)
         if appointment_type:
             appointment_type.name = name
+            appointment_type.description = description
             appointment_type.price = price
             appointment_type.duration = duration
             db.session.commit()

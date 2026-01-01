@@ -13,6 +13,8 @@ def view_invoice(invoice_id):
     client = invoice.client
     items = invoice.items if hasattr(invoice, 'items') else []
     company = Setting.query.first()
+    if request.args.get('modal') == '1':
+        return render_template('invoice_view.html', invoice=invoice, client=client, items=items, company=company)
     if request.method == 'POST':
         new_status = request.form.get('status')
         if new_status in ['brouillon', 'validée', 'envoyée']:
@@ -20,6 +22,14 @@ def view_invoice(invoice_id):
             db.session.commit()
             flash('Statut de la facture mis à jour.', 'success')
         return redirect(url_for('invoice.view_invoice', invoice_id=invoice_id))
+    # Add rdv_type_description for client if possible
+    if hasattr(client, 'rdv_type') and client.rdv_type:
+        # Try to get description from AppointmentType
+        from app.models import AppointmentType
+        appt_type = AppointmentType.query.filter_by(name=client.rdv_type).first()
+        client.rdv_type_description = appt_type.description if appt_type and appt_type.description else ''
+    else:
+        client.rdv_type_description = ''
     return render_template('invoice_view.html', invoice=invoice, client=client, items=items, company=company)
 
 @invoice_bp.route('/invoices')
@@ -54,7 +64,7 @@ def create_invoice():
     if not client_id or not appointment_type_id or not price or not date:
         flash('Tous les champs sont obligatoires.', 'danger')
         return redirect(url_for('invoice.invoices'))
-    from app.models import AppointmentType
+    from app.models import AppointmentType, InvoiceItem
     appointment_type = AppointmentType.query.get(appointment_type_id)
     if not appointment_type:
         flash('Type de RDV invalide.', 'danger')
@@ -69,6 +79,17 @@ def create_invoice():
         total=price
     )
     db.session.add(invoice)
+    db.session.flush()  # Get invoice.id before commit
+    # Add invoice item with appointment type details
+    item = InvoiceItem(
+        invoice_id=invoice.id,
+        description=appointment_type.description or appointment_type.name,
+        quantity=1,
+        unit_price=appointment_type.price,
+        total=appointment_type.price,
+        # Optionally add duration if you want to display it in the template
+    )
+    db.session.add(item)
     db.session.commit()
     flash('Facture créée avec succès.', 'success')
     return redirect(url_for('invoice.invoices'))
@@ -81,6 +102,13 @@ def invoice_pdf(invoice_id):
     invoice = Invoice.query.get_or_404(invoice_id)
     client = invoice.client
     items = invoice.items
+    # Add rdv_type_description for client if possible
+    if hasattr(client, 'rdv_type') and client.rdv_type:
+        from app.models import AppointmentType
+        appt_type = AppointmentType.query.filter_by(name=client.rdv_type).first()
+        client.rdv_type_description = appt_type.description if appt_type and appt_type.description else ''
+    else:
+        client.rdv_type_description = ''
     from app.models.setting import Setting
     company_settings = Setting.query.first()
     pdf_buffer = generate_invoice_pdf(invoice, items, client, company_settings)

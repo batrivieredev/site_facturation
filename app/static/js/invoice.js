@@ -12,3 +12,18 @@ if (invoiceSearchInput) {
             });
     });
 }
+
+// Aperçu modal de la facture
+const previewBtns = document.querySelectorAll('.preview-invoice-btn');
+previewBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const invoiceId = this.getAttribute('data-id');
+        fetch(`/invoices/${invoiceId}?modal=1`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('invoice-preview-body').innerHTML = html;
+                const modal = new bootstrap.Modal(document.getElementById('invoicePreviewModal'));
+                modal.show();
+            });
+    });
+});

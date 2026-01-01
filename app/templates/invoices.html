@@ -90,8 +90,8 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="/invoices/{{ invoice.id }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a>
-                            <a href="/invoices/{{ invoice.id }}/pdf" class="btn btn-sm btn-outline-success" download><i class="fas fa-download"></i></a>
+                            <button type="button" class="btn btn-sm btn-outline-primary preview-invoice-btn" data-id="{{ invoice.id }}"><i class="fas fa-eye"></i></button>
+                            <a href="/invoices/{{ invoice.id }}/pdf" class="btn btn-sm btn-outline-success"><i class="fas fa-download"></i></a>
                             <button class="btn btn-sm btn-outline-secondary send-invoice-btn" data-id="{{ invoice.id }}"><i class="fas fa-paper-plane"></i></button>
                             <form method="POST" action="/invoices/{{ invoice.id }}/delete" style="display:inline;">
                                 <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cette facture ?');"><i class="fas fa-trash"></i></button>
@@ -109,6 +109,19 @@
 {% endblock %}
 {% block scripts %}
 <script src="/static/js/invoice.js"></script>
+<div class="modal fade" id="invoicePreviewModal" tabindex="-1" aria-labelledby="invoicePreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="invoicePreviewModalLabel">Aperçu de la facture</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="invoice-preview-body">
+        <!-- Aperçu facture ici -->
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 // Prix auto depuis type de RDV
 const typeSelect = document.getElementById('appointment_type');
