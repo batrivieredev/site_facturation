@@ -83,6 +83,48 @@ document.addEventListener('DOMContentLoaded', function() {
             var modal = new bootstrap.Modal(document.getElementById('editMailTemplateModal'));
             modal.show();
         });
+        // Auto-fill mail template and signature with no default selection
+        const mailTemplateSelect = document.getElementById('mail-template-select');
+        const mailSignatureSelect = document.getElementById('mail-signature-select');
+        const mailSubjectInput = document.getElementById('mail-subject');
+        const mailBodyTextarea = document.getElementById('mail-body');
+
+        if (mailTemplateSelect && mailSignatureSelect && mailSubjectInput && mailBodyTextarea) {
+            mailTemplateSelect.selectedIndex = -1; // No default selection
+            mailSignatureSelect.selectedIndex = -1; // No default selection
+
+            mailTemplateSelect.addEventListener('change', function() {
+                const selectedTemplate = mailTemplateSelect.options[mailTemplateSelect.selectedIndex];
+                mailSubjectInput.value = selectedTemplate.getAttribute('data-subject');
+                mailBodyTextarea.value = selectedTemplate.getAttribute('data-body');
+            });
+
+            mailSignatureSelect.addEventListener('change', function() {
+                const selectedSignature = mailSignatureSelect.options[mailSignatureSelect.selectedIndex];
+                mailBodyTextarea.value += '\n\n' + selectedSignature.getAttribute('data-signature');
+                // Auto-append mail template and signature text
+                const mailTemplateSelect = document.getElementById('mail-template-select');
+                const mailSignatureSelect = document.getElementById('mail-signature-select');
+                const mailSubjectInput = document.getElementById('mail-subject');
+                const mailBodyTextarea = document.getElementById('mail-body');
+
+                if (mailTemplateSelect && mailSignatureSelect && mailSubjectInput && mailBodyTextarea) {
+                    mailTemplateSelect.selectedIndex = -1; // No default selection
+                    mailSignatureSelect.selectedIndex = -1; // No default selection
+
+                    mailTemplateSelect.addEventListener('change', function() {
+                        const selectedTemplate = mailTemplateSelect.options[mailTemplateSelect.selectedIndex];
+                        mailSubjectInput.value = selectedTemplate.getAttribute('data-subject');
+                        mailBodyTextarea.value += '\n\n' + selectedTemplate.getAttribute('data-body');
+                    });
+
+                    mailSignatureSelect.addEventListener('change', function() {
+                        const selectedSignature = mailSignatureSelect.options[mailSignatureSelect.selectedIndex];
+                        mailBodyTextarea.value += '\n\n' + selectedSignature.getAttribute('data-signature');
+                    });
+                }
+            });
+        }
     });
     // Edit mail signature modal
     document.querySelectorAll('.edit-mail-signature-btn').forEach(btn => {
@@ -100,4 +142,22 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.show();
         });
     });
+    // Auto-fill mail template and signature
+    const mailTemplateSelect = document.getElementById('mail-template-select');
+    const mailSignatureSelect = document.getElementById('mail-signature-select');
+    const mailSubjectInput = document.getElementById('mail-subject');
+    const mailBodyTextarea = document.getElementById('mail-body');
+
+    if (mailTemplateSelect && mailSignatureSelect && mailSubjectInput && mailBodyTextarea) {
+        mailTemplateSelect.addEventListener('change', function() {
+            const selectedTemplate = mailTemplateSelect.options[mailTemplateSelect.selectedIndex];
+            mailSubjectInput.value = selectedTemplate.getAttribute('data-subject');
+            mailBodyTextarea.value = selectedTemplate.getAttribute('data-body');
+        });
+
+        mailSignatureSelect.addEventListener('change', function() {
+            const selectedSignature = mailSignatureSelect.options[mailSignatureSelect.selectedIndex];
+            mailBodyTextarea.value += '\n\n' + selectedSignature.getAttribute('data-signature');
+        });
+    }
 });

@@ -119,7 +119,8 @@
             <label for="mail-template" class="form-label">Mail type</label>
             <select class="form-select" id="mail-template" name="template">
               {% for template in mail_templates %}
-                <option value="{{ template.id }}" data-subject="{{ template.subject|e }}" data-body="{{ template.body|e }}">{{ template.name }}</option>
+                <option value="{{ template.id }}" data-subject="{{ template.subject|e }}" data-body="{{ template.body|e }}"
+                {% if template.id == selected_template_id %}selected{% endif %}>{{ template.name }}</option>
               {% endfor %}
             </select>
             <small class="form-text text-muted">Les mails types sont créés depuis la page <b>Paramètres</b>.</small>
@@ -128,7 +129,8 @@
             <label for="mail-signature" class="form-label">Signature</label>
             <select class="form-select" id="mail-signature" name="signature">
               {% for signature in mail_signatures %}
-                <option value="{{ signature.id }}" data-signature="{{ signature.signature|e }}">{{ signature.name }}</option>
+                <option value="{{ signature.id }}" data-signature="{{ signature.signature|e }}"
+                {% if signature.id == selected_signature_id %}selected{% endif %}>{{ signature.name }}</option>
               {% endfor %}
             </select>
             <small class="form-text text-muted">Les signatures sont créées depuis la page <b>Paramètres</b>.</small>
@@ -145,11 +147,11 @@
           </div>
           <div class="mb-3">
             <label for="mail-subject" class="form-label">Sujet</label>
-            <input type="text" class="form-control" id="mail-subject" name="subject" required>
+            <input type="text" class="form-control" id="mail-subject" name="subject" value="{{ subject }}" required>
           </div>
           <div class="mb-3">
             <label for="mail-body" class="form-label">Message</label>
-            <textarea class="form-control" id="mail-body" name="body" rows="12" style="min-height:200px;resize:vertical;" required></textarea>
+            <textarea class="form-control" id="mail-body" name="body" rows="10" style="min-height:300px;resize:vertical;">{{ body }}</textarea>
           </div>
         </div>
         <div class="modal-footer">

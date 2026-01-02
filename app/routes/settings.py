@@ -126,6 +126,38 @@ def delete_attachment():
 
 # --- MailTemplate & MailSignature CRUD routes must be top-level, not nested ---
 
+@settings_bp.route('/delete_mail_template/<int:template_id>', methods=['POST'])
+def delete_mail_template(template_id):
+    from flask import redirect, url_for, flash
+    try:
+        template = MailTemplate.query.get(template_id)
+        if template:
+            db.session.delete(template)
+            db.session.commit()
+            flash('Mail type supprimé avec succès.', 'success')
+        else:
+            flash('Mail type introuvable.', 'danger')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erreur lors de la suppression : {str(e)}', 'danger')
+    return redirect(url_for('settings.settings'))
+
+@settings_bp.route('/delete_mail_signature/<int:signature_id>', methods=['POST'])
+def delete_mail_signature(signature_id):
+    from flask import redirect, url_for, flash
+    try:
+        signature = MailSignature.query.get(signature_id)
+        if signature:
+            db.session.delete(signature)
+            db.session.commit()
+            flash('Signature supprimée avec succès.', 'success')
+        else:
+            flash('Signature introuvable.', 'danger')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erreur lors de la suppression : {str(e)}', 'danger')
+    return redirect(url_for('settings.settings'))
+
 @settings_bp.route('/edit_mail_template/<int:template_id>', methods=['POST'])
 def edit_mail_template(template_id):
     print(f"[DEBUG] edit_mail_template called with id={template_id}")
@@ -155,7 +187,7 @@ def add_mail_template():
     from flask import request, redirect, url_for, flash
     name = request.form.get('name')
     subject = request.form.get('subject')
-    body = request.form.get('body')
+    body = request.form.get('body').replace('\r\n', '\n')
     if not name or not body:
         flash('Tous les champs sont obligatoires.', 'danger')
         return redirect(url_for('settings.settings'))
